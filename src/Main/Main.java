@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 class SharedResources {
     public static int amount;
@@ -23,23 +24,31 @@ class User extends Thread {
 
     @Override
     public void run() {
+        Random r = new Random();
+        int willBuy = r.nextInt(100) % 2;
 
-        System.out.println("Main.User " + id + ": waiting for a permit.");
+        System.out.println("User " + id + ": waiting for a permit.");
         try {
             sem2.acquire();
+        } catch (InterruptedException ignored) {
+        }
+
+        try {
+            if (SharedResources.amount == 0) {
+                sem2.release();
+                if (!sem.tryAcquire(10000, TimeUnit.MILLISECONDS)) {
+                    System.out.println("User " + id + ": After 10 seconds, there are still no ticket left. Now killing the Thread");
+                    return;
+                }
+            } else {
+                sem.acquire();
+            }
+
         } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
-        // acquire the permit
-        if (!sem.tryAcquire()) {
-            System.out.println("Main.User " + id + " cannot acquire a permit as all tickets have been bought");
-            sem2.release();
-            return;
-        }
-        System.out.println("Main.User " + id + ": Acquired permit");
+        System.out.println("User " + id + ": Acquired permit");
 
-        Random r = new Random();
         int randomInt = r.nextInt(300) + 10;
 
         try {
@@ -49,9 +58,14 @@ class User extends Thread {
         }
 
         // access shared resource
-        System.out.println("Main.User " + id + " just bought a ticket, there are "
-                + --SharedResources.amount + " tickets left...");
+        System.out.println("User " + id + " just bought a ticket, there are " + --SharedResources.amount + " tickets left...");
 
+        if (willBuy == 0) {
+            System.out.println("User " + id + " cancels the reservation of a ticket, there are still " + ++SharedResources.amount + " tickets left...");
+            sem.release();
+            sem2.release();
+            return;
+        }
         sem2.release();
     }
 }
@@ -75,7 +89,7 @@ public class Main {
         List<User> users = new ArrayList<>();
 
         for (int i = 0; i < amountOfUsers; i++) {
-            User user = new User(sem, sem2, i+1);
+            User user = new User(sem, sem2, i + 1);
             users.add(user);
         }
 
