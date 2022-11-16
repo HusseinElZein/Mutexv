@@ -30,22 +30,21 @@ class User extends Thread {
         System.out.println("User " + id + ": waiting for a permit.");
         try {
             sem2.acquire();
-        } catch (InterruptedException ignored) {
-        }
+        } catch (InterruptedException ignored) {}
 
         try {
             if (SharedResources.amount == 0) {
                 sem2.release();
                 if (!sem.tryAcquire(10000, TimeUnit.MILLISECONDS)) {
-                    System.out.println("User " + id + ": After 10 seconds, there are still no ticket left. Now killing the Thread");
+                    System.out.println("User " + id + ": After 10 seconds, there are still no ticket left." +
+                            " Now killing the Thread");
+                    this.interrupt();
                     return;
                 }
             } else {
                 sem.acquire();
             }
-
-        } catch (InterruptedException e) {
-        }
+        } catch (InterruptedException e) {}
 
         System.out.println("User " + id + ": Acquired permit");
 
