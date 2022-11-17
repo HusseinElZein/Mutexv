@@ -20,7 +20,9 @@ If you enter an amount of tickets that's equal to the amount of users - there wi
 be no tickets left at the end of the program.
 
 If you enter an amount of tickets that's less than the amount of users - some users wont be 
-able to buy the tickets because it has been sold out (a way of displaying deadlock)
+able to buy the tickets because it has been sold out (a way of displaying deadlock) - a user 
+can stil escape the deadlock/waiting state if another user cancels his reservation for the ticket
+and therefore get to buy a ticket.
 
 
 
