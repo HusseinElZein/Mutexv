@@ -1,9 +1,10 @@
 # Mutex
 
-HOW TO COMPILE THE CODE:
 
 The code representates a scenario, in which users are buying tickets through a booking system. A number of users would be able to buy ONE ticket, each time a user buys a ticket - the amount of tickets will decrease.
 
+
+HOW TO COMPILE THE CODE:
 When running the code, you will need to enter two input fields. The first input field requires the amount of tickets available in stock, as seen below: "Amount of tickets in stock: "
 
 The second input field required the amount of users that wants to buy the ticket, as seen below: "Amount of users: "
